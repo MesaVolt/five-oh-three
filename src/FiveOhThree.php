@@ -3,7 +3,7 @@
 abstract class FiveOhThree
 {
     private const DEFAULTS = [
-        'lock_path' => __DIR__.'/../../deploying.lock',
+        'lock_path' => __DIR__.'/../../../../deploying.lock',
         'template' => __DIR__.'/../res/template.php',
 
         // default template configuration

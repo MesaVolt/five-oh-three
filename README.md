@@ -19,7 +19,7 @@ add these two lines as very first instructions:
 ```php
 <?php
 
-require __DIR__.'/../../MesaVolt/five-oh-three/src/FiveOhThree.php';
+require __DIR__.'/../vendor/mesavolt/five-oh-three/src/FiveOhThree.php';
 FiveOhThree::checkAndRender();
 ```
 
