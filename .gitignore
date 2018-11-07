@@ -1,0 +1,8 @@
+vendor/
+composer.lock
+.DS_Store
+.idea
+/tests/cache-dir
+
+/coverage.xml
+/coverage

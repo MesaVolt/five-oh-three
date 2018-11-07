@@ -1,0 +1,23 @@
+{
+    "name": "mesavolt/five-oh-three",
+    "description": "Maintenance page, pretty and simple.",
+    "keywords": ["503", "maintenance"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MesaVolt",
+            "email": "contact@mesavolt.com"
+        }
+    ],
+    "type": "library",
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=7.1"
+    },
+    "require-dev": {
+        "php-coveralls/php-coveralls": "^2.1",
+        "phpunit/phpunit": "^7.2"
+    }
+}
