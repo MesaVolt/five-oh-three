@@ -23,7 +23,7 @@ abstract class FiveOhThree
         if (is_file($options['lock_path'])) {
             header('HTTP/1.1 503 Service Unavailable');
 
-            // Make some variables accessible to the template.
+            // Render specified (or default) template.
             include $options['template'];
 
             die();
