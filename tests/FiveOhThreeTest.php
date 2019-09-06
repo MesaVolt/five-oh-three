@@ -23,7 +23,7 @@ class FiveOhThreeTest extends TestCase
         $this->assertFalse(LockGuard::lockFileExists('/i-do-not-exist'), "Lock file shouldn't be detected");
 
         $_ENV['FIVEOHTHREE_IGNORE_LOCK'] = 'true';
-        $this->assertFalse(LockGuard::lockFileExists('/i-do-not-exists'), 'Lock file should be ignored');
+        $this->assertFalse(LockGuard::lockFileExists(__FILE__), 'Lock file should be ignored');
     }
 
     public function test_checkAndThrow()
