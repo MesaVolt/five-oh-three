@@ -6,7 +6,7 @@ namespace Mesavolt\FiveOhThree;
 /**
  * Exception thrown by the LockGuard when a lock file is detected
  */
-class LockFileException extends \Exception
+class LockFileException extends \RuntimeException
 {
     public $lock;
 
