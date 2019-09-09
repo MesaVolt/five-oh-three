@@ -22,7 +22,7 @@ abstract class LockGuard
      */
     public static function lockFileExists(string $path): bool
     {
-        $ignoreFlag = (bool) ($_ENV['FIVEOHTHREE_IGNORE_LOCK'] ?? false);
+        $ignoreFlag = (bool) ($_ENV['FIVEOHTHREE_IGNORE_LOCK'] ?? getenv('FIVEOHTHREE_IGNORE_LOCK') ?? false);
         if ($ignoreFlag === true) {
             return false;
         }

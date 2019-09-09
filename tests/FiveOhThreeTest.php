@@ -15,6 +15,7 @@ class FiveOhThreeTest extends TestCase
 
         // ensure each test gets a clean env
         unset($_ENV['FIVEOHTHREE_IGNORE_LOCK']);
+        putenv('FIVEOHTHREE_IGNORE_LOCK');
     }
 
     public function test_lockFileExists()
@@ -24,6 +25,12 @@ class FiveOhThreeTest extends TestCase
 
         $_ENV['FIVEOHTHREE_IGNORE_LOCK'] = 'true';
         $this->assertFalse(LockGuard::lockFileExists(__FILE__), 'Lock file should be ignored');
+
+        unset($_ENV['FIVEOHTHREE_IGNORE_LOCK']);
+        $this->assertTrue(LockGuard::lockFileExists(__FILE__), 'Lock file should be detected again');
+
+        putenv('FIVEOHTHREE_IGNORE_LOCK=true');
+        $this->assertFalse(LockGuard::lockFileExists(__FILE__), 'Lock file should be ignored again');
     }
 
     public function test_checkAndThrow()
