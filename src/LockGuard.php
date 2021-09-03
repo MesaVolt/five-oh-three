@@ -2,6 +2,7 @@
 
 namespace Mesavolt\FiveOhThree;
 
+use Negotiation\Negotiator;
 
 abstract class LockGuard
 {
@@ -53,14 +54,41 @@ abstract class LockGuard
     public static function checkAndRender(array $options = []): void
     {
         $options = array_merge(self::DEFAULTS, $options);
-
-        if (self::lockFileExists($options['lock_path'])) {
-            header('HTTP/1.1 503 Service Unavailable');
-
-            // Render specified (or default) template.
-            include $options['template'];
-
-            die();
+        if (!self::lockFileExists($options['lock_path'])) {
+            return;
         }
+
+        [$headers, $body] = self::getResponse($options, $_SERVER['HTTP_ACCEPT']);
+        foreach ($headers as $header) {
+            header($header);
+        }
+        echo $body;
+
+        die();
+    }
+
+    private static function getResponse(array $options, string $acceptHeader): array
+    {
+        $headers = ['HTTP/1.1 503 Service Unavailable'];
+
+        // Check request's Accept header, to return HTML or JSON
+        $negotiator = new Negotiator();
+        $mediaType = $negotiator->getBest($acceptHeader, ['text/html', 'application/json']);
+        $value = $mediaType !== null ? $mediaType->getValue() : null;
+
+        if ($value === 'application/json') {
+            // Client expected JSON, return some
+            $headers[] = 'Content-Type: application/json; charset=utf-8';
+            $body = '{"success": false}';
+        } else {
+            // Client probably expects HTML, return some
+            $headers[] = 'Content-Type: text/html; charset=utf-8';
+            // Render specified (or default) template.
+            ob_start();
+            include $options['template'];
+            $body = ob_get_clean();
+        }
+
+        return [$headers, $body];
     }
 }
