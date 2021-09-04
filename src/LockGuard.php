@@ -59,6 +59,7 @@ abstract class LockGuard
         }
 
         [$headers, $body] = self::getResponse($options, $_SERVER['HTTP_ACCEPT']);
+
         foreach ($headers as $header) {
             header($header);
         }
@@ -70,6 +71,10 @@ abstract class LockGuard
     private static function getResponse(array $options, string $acceptHeader): array
     {
         $headers = ['HTTP/1.1 503 Service Temporarily Unavailable'];
+
+        if ($options['auto_refresh']) {
+            $headers[] = 'Retry-After: '.$options['auto_refresh_interval'];
+        }
 
         // Check request's Accept header, to return HTML or JSON
         $negotiator = new Negotiator();
