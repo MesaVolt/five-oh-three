@@ -63,7 +63,7 @@ class FiveOhThreeTest extends TestCase
     {
         [$headers, $body] = $this->invokeGetResponse($acceptHeader);
 
-        self::assertContains('HTTP/1.1 503 Service Unavailable', $headers);
+        self::assertContains('HTTP/1.1 503 Service Temporarily Unavailable', $headers);
         
         if ($expectJson) {
             self::assertSame('{"success": false}', $body);

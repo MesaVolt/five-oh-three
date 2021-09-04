@@ -69,7 +69,7 @@ abstract class LockGuard
 
     private static function getResponse(array $options, string $acceptHeader): array
     {
-        $headers = ['HTTP/1.1 503 Service Unavailable'];
+        $headers = ['HTTP/1.1 503 Service Temporarily Unavailable'];
 
         // Check request's Accept header, to return HTML or JSON
         $negotiator = new Negotiator();
