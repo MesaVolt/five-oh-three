@@ -58,7 +58,7 @@ abstract class LockGuard
             return;
         }
 
-        [$headers, $body] = self::getResponse($options, $_SERVER['HTTP_ACCEPT']);
+        [$headers, $body] = self::getResponse($options, $_SERVER['HTTP_ACCEPT'] ?? null);
 
         foreach ($headers as $header) {
             header($header);
@@ -68,7 +68,10 @@ abstract class LockGuard
         die();
     }
 
-    private static function getResponse(array $options, string $acceptHeader): array
+    /**
+     * Returns response's headers & body according to options & request's HTTP_ACCEPT header.
+     */
+    private static function getResponse(array $options, ?string $acceptHeader): array
     {
         $headers = ['HTTP/1.1 503 Service Temporarily Unavailable'];
 
@@ -77,11 +80,16 @@ abstract class LockGuard
         }
 
         // Check request's Accept header, to return HTML or JSON
-        $negotiator = new Negotiator();
-        $mediaType = $negotiator->getBest($acceptHeader, ['text/html', 'application/json']);
-        $value = $mediaType !== null ? $mediaType->getValue() : null;
+        $format = null;
+        if ($acceptHeader !== null && $acceptHeader !== '') {
+            $negotiator = new Negotiator();
 
-        if ($value === 'application/json') {
+            if (null !== $mediaType = $negotiator->getBest($acceptHeader, ['text/html', 'application/json'])) {
+                $format = $mediaType->getValue();
+            }
+        }
+
+        if ($format === 'application/json') {
             // Client expected JSON, return some
             $headers[] = 'Content-Type: application/json; charset=utf-8';
             $body = '{"success": false}';

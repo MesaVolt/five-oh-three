@@ -40,7 +40,7 @@ class FiveOhThreeTest extends TestCase
         LockGuard::checkAndThrow(['lock_path' => __FILE__]);
     }
 
-    private function invokeGetResponse(string $acceptHeader): array
+    private function invokeGetResponse(?string $acceptHeader): array
     {
         $reflection = new ReflectionClass(LockGuard::class);
         $method = $reflection->getMethod('getResponse');
@@ -59,13 +59,13 @@ class FiveOhThreeTest extends TestCase
     /**
      * @dataProvider dataProvider_getResponse
      */
-    public function test_getResponse(string $acceptHeader, bool $expectJson): void
+    public function test_getResponse(?string $acceptHeader, bool $expectJson): void
     {
         [$headers, $body] = $this->invokeGetResponse($acceptHeader);
 
         self::assertContains('HTTP/1.1 503 Service Temporarily Unavailable', $headers);
         self::assertContains('Retry-After: 8', $headers);
-        
+
         if ($expectJson) {
             self::assertSame('{"success": false}', $body);
             self::assertContains('Content-Type: application/json; charset=utf-8', $headers);
@@ -81,7 +81,8 @@ class FiveOhThreeTest extends TestCase
             ['application/json', true],
             ['application/json, text/javascript, */*; q=0.01', true],
             ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', false],
-            ['*/*', false]
+            ['*/*', false],
+            [null, false],
         ];
     }
 }
