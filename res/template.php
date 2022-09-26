@@ -10,8 +10,6 @@
         <meta http-equiv="refresh" content="<?php echo $options['auto_refresh_interval']; ?>">
     <?php } ?>
 
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-
     <style>
         html {
             line-height: 1.15;
@@ -22,7 +20,8 @@
         }
         body {
             margin: 0;
-            font-family: 'Source Sans Pro', sans-serif;
+            /* @see https://getbootstrap.com/docs/5.2/content/reboot/#native-font-stack */
+            font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif;
             background: #ffffff;
             display: flex;
             flex-direction: column;
