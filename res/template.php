@@ -31,6 +31,7 @@
 
         h1 {
             margin-bottom: 0;
+            text-align: center;
         }
         p {
             opacity: 0.7;
