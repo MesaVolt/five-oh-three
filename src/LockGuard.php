@@ -51,21 +51,38 @@ abstract class LockGuard
      * Checks if the lock file exists.
      * If so, sends a 503 Service Unavailable header, renders a pretty maintenance page and halts script execution.
      */
-    public static function checkAndRender(array $options = []): void
+    public static function checkAndRender(array $options = [], ?RequestHandlerInterface $handler = null): void
     {
         $options = array_merge(self::DEFAULTS, $options);
         if (!self::lockFileExists($options['lock_path'])) {
             return;
         }
 
+        $handler ??= new HttpRequestHandler();
+
+        $bypassParameterName = $options['bypass_parameter_name'] ?? null ?: null;
+        $bypassParameterValue = $options['bypass_parameter_value'] ?? null ?: null;
+        if ($bypassParameterName !== null && $bypassParameterValue !== null) {
+            $bypassCookie = $_COOKIE[$bypassParameterName] ?? null;
+            $bypassRequest = $_REQUEST[$bypassParameterName] ?? null;
+
+            $bypass = $bypassCookie ?? $bypassRequest;
+            if ($bypass !== null && $bypass === $bypassParameterValue) {
+                if ($bypassCookie === null) {
+                    $handler->setCookie($bypassParameterName, $bypass);
+                }
+                return;
+            }
+        }
+
         [$headers, $body] = self::getResponse($options, $_SERVER['HTTP_ACCEPT'] ?? null);
 
         foreach ($headers as $header) {
-            header($header);
+            $handler->setHeader($header);
         }
-        echo $body;
 
-        die();
+        $handler->setContent($body);
+        $handler->terminate();
     }
 
     /**

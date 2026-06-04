@@ -5,11 +5,20 @@ namespace Tests;
 
 use Mesavolt\FiveOhThree\LockFileException;
 use Mesavolt\FiveOhThree\LockGuard;
+use Mesavolt\FiveOhThree\TestRequestHandler;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 class FiveOhThreeTest extends TestCase
 {
+    protected TestRequestHandler $handler;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->handler = new TestRequestHandler();
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -40,6 +49,81 @@ class FiveOhThreeTest extends TestCase
         LockGuard::checkAndThrow(['lock_path' => __FILE__]);
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testCheckAndRenderBypassWithCorrectValue(): void
+    {
+        $_REQUEST['let_me_in'] = 'please';
+
+        LockGuard::checkAndRender([
+            'lock_path' => __FILE__,
+            'bypass_parameter_name' => 'let_me_in',
+            'bypass_parameter_value' => 'please',
+        ], $this->handler);
+
+        self::assertFalse($this->handler->terminated, 'We should not have been blocked');
+        self::assertEmpty($this->handler->headers);
+        self::assertNull($this->handler->content);
+        self::assertNotEmpty($this->handler->cookies);
+        self::assertArrayHasKey('let_me_in', $this->handler->cookies);
+        self::assertSame('please', $this->handler->cookies['let_me_in']);
+    }
+
+    public function dataProvider_testCheckAndRenderBypassWithWrongValue(): array
+    {
+        return [
+            [null, 'please'],
+            ['let_me_in', ''],
+            ['let_me_in', null],
+            ['let_me_pass', 'please'],
+            ['let_me_in', 'please ? '],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProvider_testCheckAndRenderBypassWithWrongValue
+     */
+    public function testCheckAndRenderBypassWithWrongValueInRequest(?string $parameter, ?string $value): void
+    {
+        if ($parameter !== null) {
+            $_REQUEST[$parameter] = $value;
+        }
+
+        LockGuard::checkAndRender([
+            'lock_path' => __FILE__,
+            'bypass_parameter_name' => 'let_me_in',
+            'bypass_parameter_value' => 'please',
+        ], $this->handler);
+
+        self::assertTrue($this->handler->terminated, 'We should have been blocked');
+        self::assertNotEmpty($this->handler->headers);
+        self::assertNotNull($this->handler->content);
+        self::assertEmpty($this->handler->cookies);
+    }
+
+    /**
+     * @dataProvider dataProvider_testCheckAndRenderBypassWithWrongValue
+     */
+    public function testCheckAndRenderBypassWithWrongValueInCookie(?string $parameter, ?string $value): void
+    {
+        if ($parameter !== null) {
+            $_COOKIE[$parameter] = $value;
+        }
+
+        LockGuard::checkAndRender([
+            'lock_path' => __FILE__,
+            'bypass_parameter_name' => 'let_me_in',
+            'bypass_parameter_value' => 'please',
+        ], $this->handler);
+
+        self::assertTrue($this->handler->terminated, 'We should have been blocked');
+        self::assertNotEmpty($this->handler->headers);
+        self::assertNotNull($this->handler->content);
+        self::assertEmpty($this->handler->cookies);
+    }
+
     private function invokeGetResponse(?string $acceptHeader): array
     {
         $reflection = new ReflectionClass(LockGuard::class);
@@ -52,7 +136,7 @@ class FiveOhThreeTest extends TestCase
                 'auto_refresh_interval' => 8,
                 'icon' => '/apple-touch-icon.png',
             ],
-            $acceptHeader
+            $acceptHeader,
         ]);
     }
 
