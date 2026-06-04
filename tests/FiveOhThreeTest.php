@@ -5,7 +5,6 @@ namespace Tests;
 
 use Mesavolt\FiveOhThree\LockFileException;
 use Mesavolt\FiveOhThree\LockGuard;
-use Mesavolt\FiveOhThree\TestRequestHandler;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 

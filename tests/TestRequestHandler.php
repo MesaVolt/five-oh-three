@@ -1,7 +1,9 @@
 <?php
 
-namespace Mesavolt\FiveOhThree;
+namespace Tests;
 
+
+use Mesavolt\FiveOhThree\RequestHandlerInterface;
 
 class TestRequestHandler implements RequestHandlerInterface
 {

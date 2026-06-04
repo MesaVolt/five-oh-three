@@ -1,0 +1,7 @@
+# Exclude non-essential files from dist
+
+*.github export-ignore
+/tests export-ignore
+phpunit.xml* export-ignore
+/src/Commands export-ignore
+/vendor
