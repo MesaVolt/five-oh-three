@@ -24,11 +24,11 @@
         }
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.4",
         "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
         "php-coveralls/php-coveralls": "^2.1",
-        "phpunit/phpunit": "^7.2"
+        "phpunit/phpunit": "^9.6"
     }
 }
