@@ -54,7 +54,7 @@ class FiveOhThreeTest extends TestCase
      */
     public function testCheckAndRenderBypassWithCorrectValue(): void
     {
-        $_REQUEST['let_me_in'] = 'please';
+        $this->handler->requestParameters['let_me_in'] = 'please';
 
         LockGuard::checkAndRender([
             'lock_path' => __FILE__,
@@ -87,7 +87,7 @@ class FiveOhThreeTest extends TestCase
     public function testCheckAndRenderBypassWithWrongValueInRequest(?string $parameter, ?string $value): void
     {
         if ($parameter !== null) {
-            $_REQUEST[$parameter] = $value;
+            $this->handler->requestParameters[$parameter] = $value;
         }
 
         LockGuard::checkAndRender([
@@ -108,7 +108,7 @@ class FiveOhThreeTest extends TestCase
     public function testCheckAndRenderBypassWithWrongValueInCookie(?string $parameter, ?string $value): void
     {
         if ($parameter !== null) {
-            $_COOKIE[$parameter] = $value;
+            $this->handler->setCookie($parameter, $value);
         }
 
         LockGuard::checkAndRender([
@@ -120,7 +120,39 @@ class FiveOhThreeTest extends TestCase
         self::assertTrue($this->handler->terminated, 'We should have been blocked');
         self::assertNotEmpty($this->handler->headers);
         self::assertNotNull($this->handler->content);
-        self::assertEmpty($this->handler->cookies);
+    }
+
+    public function testCheckAndRenderOverridesPreviousCookieIfNewRequestValueIsValid(): void
+    {
+        $this->handler->setCookie('let_me_in', 'b***h');
+        $this->handler->requestParameters['let_me_in'] = 'please';
+
+        // sanity check
+        self::assertSame('b***h', $this->handler->cookies['let_me_in']);
+
+        LockGuard::checkAndRender([
+            'lock_path' => __FILE__,
+            'bypass_parameter_name' => 'let_me_in',
+            'bypass_parameter_value' => 'please',
+        ], $this->handler);
+
+        self::assertFalse($this->handler->terminated, 'We should not have been blocked');
+        self::assertEmpty($this->handler->headers);
+        self::assertNull($this->handler->content);
+        self::assertNotEmpty($this->handler->cookies);
+        self::assertArrayHasKey('let_me_in', $this->handler->cookies);
+        self::assertSame('please', $this->handler->cookies['let_me_in'], 'The cookie value should have been overridden');
+
+        // now that the correct cookie is set, the request parameter is not necessary anymore
+        $this->handler->requestParameters = [];
+
+        LockGuard::checkAndRender([
+            'lock_path' => __FILE__,
+            'bypass_parameter_name' => 'let_me_in',
+            'bypass_parameter_value' => 'please',
+        ], $this->handler);
+
+        self::assertFalse($this->handler->terminated, 'We should not have been blocked');
     }
 
     private function invokeGetResponse(?string $acceptHeader): array

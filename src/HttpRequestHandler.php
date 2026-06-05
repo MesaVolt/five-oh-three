@@ -5,12 +5,22 @@ namespace Mesavolt\FiveOhThree;
 
 class HttpRequestHandler implements RequestHandlerInterface
 {
+    public function getRequestParameter(string $name): ?string
+    {
+        return $_REQUEST[$name] ?? null;
+    }
+
     public function setHeader(string $header): void
     {
         header($header);
     }
 
-    public function setCookie(string $name, string $value): void
+    public function getCookie(string $name): ?string
+    {
+        return $_COOKIE[$name] ?? null;
+    }
+
+    public function setCookie(string $name, ?string $value): void
     {
         setcookie($name, $value);
     }

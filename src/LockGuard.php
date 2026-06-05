@@ -63,12 +63,12 @@ abstract class LockGuard
         $bypassParameterName = $options['bypass_parameter_name'] ?? null ?: null;
         $bypassParameterValue = $options['bypass_parameter_value'] ?? null ?: null;
         if ($bypassParameterName !== null && $bypassParameterValue !== null) {
-            $bypassCookie = $_COOKIE[$bypassParameterName] ?? null;
-            $bypassRequest = $_REQUEST[$bypassParameterName] ?? null;
+            $bypassCookie = $handler->getCookie($bypassParameterName); // $_COOKIE[$bypassParameterName] ?? null;
+            $bypassRequest = $handler->getRequestParameter($bypassParameterName); // $_REQUEST[$bypassParameterName] ?? null;
 
-            $bypass = $bypassCookie ?? $bypassRequest;
+            $bypass = $bypassRequest ?? $bypassCookie;
             if ($bypass !== null && $bypass === $bypassParameterValue) {
-                if ($bypassCookie === null) {
+                if ($bypassCookie !== $bypassParameterValue) {
                     $handler->setCookie($bypassParameterName, $bypass);
                 }
                 return;
