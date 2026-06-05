@@ -20,9 +20,9 @@ class HttpRequestHandler implements RequestHandlerInterface
         return $_COOKIE[$name] ?? null;
     }
 
-    public function setCookie(string $name, ?string $value): void
+    public function setCookie(string $name, ?string $value, array $options = []): void
     {
-        setcookie($name, $value);
+        setcookie($name, $value, $options);
     }
 
     public function setContent(string $content): void

@@ -29,7 +29,7 @@ class TestRequestHandler implements RequestHandlerInterface
         return $this->cookies[$name] ?? null;
     }
 
-    public function setCookie(string $name, ?string $value): void
+    public function setCookie(string $name, ?string $value, array $options = []): void
     {
         $this->cookies[$name] = $value;
     }

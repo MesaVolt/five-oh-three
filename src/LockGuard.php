@@ -69,7 +69,7 @@ abstract class LockGuard
             $bypass = $bypassRequest ?? $bypassCookie;
             if ($bypass !== null && $bypass === $bypassParameterValue) {
                 if ($bypassCookie !== $bypassParameterValue) {
-                    $handler->setCookie($bypassParameterName, $bypass);
+                    $handler->setCookie($bypassParameterName, $bypass, ['secure' => true, 'httponly' => true]);
                 }
                 return;
             }
